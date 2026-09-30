@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NowProjects | ServiceNow SecOps & GRC Implementation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black: #0a0a0a;
+      --white: #ffffff;
+      --gray-50: #f9f9f9;
+      --gray-100: #f0f0f0;
+      --gray-200: #e0e0e0;
+      --gray-400: #9a9a9a;
+      --gray-600: #555555;
+      --gray-800: #1e1e1e;
+      --accent: #0057ff;
+      --accent-dark: #0040cc;
+      --accent-light: #e8efff;
+      --green: #00b37e;
+      --green-light: #e6f7f1;
+      --radius: 16px;
+      --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--white);
+      color: var(--black);
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 5%;
+      background: rgba(255,255,255,0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      transition: box-shadow var(--transition);
+    }
+    nav.scrolled { box-shadow: 0 2px 24px rgba(0,0,0,0.07); }
+
+    .logo {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--black);
+      text-decoration: none;
+    }
+    .logo span { color: var(--accent); }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      list-style: none;
+    }
+    .nav-links a {
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--gray-600);
+      transition: color var(--transition);
+    }
+    .nav-links a:hover { color: var(--black); }
+
+    .nav-cta {
+      background: var(--black) !important;
+      color: var(--white) !important;
+      padding: 10px 22px;
+      border-radius: 100px;
+      font-weight: 600 !important;
+      font-size: 0.85rem !important;
+      transition: background var(--transition), transform var(--transition) !important;
+    }
+    .nav-cta:hover { background: var(--accent) !important; transform: translateY(-1px); }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 130px 5% 90px;
+      background: linear-gradient(160deg, #f0f5ff 0%, #ffffff 55%);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -180px; right: -180px;
+      width: 640px; height: 640px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,87,255,0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -80px; left: -120px;
+      width: 480px; height: 480px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,179,126,0.05) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent-light);
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 7px 16px;
+      border-radius: 100px;
+      margin-bottom: 28px;
+      animation: fadeUp 0.6s ease both;
+    }
+    .badge-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 2s ease infinite;
+    }
+
+    h1 {
+      font-size: clamp(2.6rem, 6vw, 5rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      max-width: 860px;
+      animation: fadeUp 0.6s 0.1s ease both;
+    }
+    h1 em { font-style: normal; color: var(--accent); }
+
+    .hero-sub {
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: var(--gray-600);
+      max-width: 560px;
+      margin: 24px auto 48px;
+      font-weight: 400;
+      animation: fadeUp 0.6s 0.2s ease both;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+      animation: fadeUp 0.6s 0.3s ease both;
+    }
+
+    .btn-primary {
+      background: var(--black);
+      color: var(--white);
+      text-decoration: none;
+      padding: 15px 32px;
+      border-radius: 100px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+    }
+    .btn-primary:hover {
+      background: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(0,87,255,0.25);
+    }
+
+    .btn-secondary {
+      color: var(--gray-600);
+      text-decoration: none;
+      padding: 15px 32px;
+      border-radius: 100px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      border: 1px solid var(--gray-200);
+      transition: border-color var(--transition), color var(--transition), transform var(--transition);
+    }
+    .btn-secondary:hover {
+      border-color: var(--black);
+      color: var(--black);
+      transform: translateY(-2px);
+    }
+
+    /* Product pills */
+    .product-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 56px;
+      animation: fadeUp 0.6s 0.4s ease both;
+    }
+    .pill {
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      color: var(--gray-600);
+      font-size: 0.8rem;
+      font-weight: 500;
+      padding: 7px 16px;
+      border-radius: 100px;
+      transition: border-color var(--transition), color var(--transition), box-shadow var(--transition);
+    }
+    .pill:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      box-shadow: 0 4px 16px rgba(0,87,255,0.1);
+    }
+
+    /* trust strip */
+    .trust-strip {
+      background: var(--gray-50);
+      border-top: 1px solid var(--gray-100);
+      border-bottom: 1px solid var(--gray-100);
+      padding: 28px 5%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .trust-strip p {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--gray-400);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .trust-divider { color: var(--gray-200); }
+    .trust-item {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--gray-600);
+    }
+
+    /* ── SECTION BASE ── */
+    section { padding: 100px 5%; }
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      max-width: 620px;
+    }
+    .section-sub {
+      color: var(--gray-600);
+      font-size: 1.05rem;
+      max-width: 520px;
+      margin-top: 16px;
+      line-height: 1.7;
+    }
+
+    /* ── PRODUCTS ── */
+    #products { background: var(--gray-50); }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-top: 60px;
+    }
+
+    .product-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 36px;
+      border: 1px solid var(--gray-100);
+      transition: box-shadow var(--transition), transform var(--transition), border-color var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    .product-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), #7b2ff7);
+      opacity: 0;
+      transition: opacity var(--transition);
+    }
+    .product-card:hover {
+      box-shadow: 0 16px 48px rgba(0,0,0,0.08);
+      transform: translateY(-4px);
+      border-color: transparent;
+    }
+    .product-card:hover::before { opacity: 1; }
+
+    .product-tag {
+      display: inline-block;
+      background: var(--accent-light);
+      color: var(--accent);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 100px;
+      margin-bottom: 20px;
+    }
+    .product-tag.green { background: var(--green-light); color: var(--green); }
+
+    .product-icon {
+      font-size: 2rem;
+      margin-bottom: 16px;
+      display: block;
+    }
+    .product-card h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+    .product-card p {
+      font-size: 0.9rem;
+      color: var(--gray-600);
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+    .product-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .product-features li {
+      font-size: 0.85rem;
+      color: var(--gray-600);
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .product-features li::before {
+      content: '→';
+      color: var(--accent);
+      font-weight: 600;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* featured card */
+    .product-card.featured {
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+      border-color: transparent;
+      color: var(--white);
+    }
+    .product-card.featured h3 { color: var(--white); }
+    .product-card.featured p { color: rgba(255,255,255,0.55); }
+    .product-card.featured .product-features li { color: rgba(255,255,255,0.6); }
+    .product-card.featured .product-features li::before { color: #4d8eff; }
+
+    /* ── PROCESS ── */
+    #process { background: var(--white); }
+    .process-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: start;
+      margin-top: 60px;
+    }
+    .process-steps { display: flex; flex-direction: column; }
+    .step {
+      display: flex;
+      gap: 24px;
+      padding: 28px 0;
+      border-bottom: 1px solid var(--gray-100);
+    }
+    .step:last-child { border-bottom: none; }
+    .step:hover .step-num { background: var(--accent); color: var(--white); }
+    .step-num {
+      width: 36px; height: 36px; min-width: 36px;
+      border-radius: 50%;
+      background: var(--gray-100);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem; font-weight: 700; color: var(--gray-600);
+      transition: var(--transition);
+    }
+    .step-content h4 { font-size: 1rem; font-weight: 600; margin-bottom: 6px; letter-spacing: -0.01em; }
+    .step-content p { font-size: 0.9rem; color: var(--gray-600); line-height: 1.6; }
+
+    .process-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: sticky;
+      top: 100px;
+    }
+    .panel-card {
+      background: var(--gray-50);
+      border-radius: 14px;
+      padding: 24px;
+      border: 1px solid var(--gray-100);
+    }
+    .panel-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .panel-card h5 { font-size: 0.85rem; font-weight: 600; }
+    .status-badge {
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 100px;
+    }
+    .status-green { background: var(--green-light); color: var(--green); }
+    .status-blue { background: var(--accent-light); color: var(--accent); }
+    .panel-progress {
+      height: 6px;
+      background: var(--gray-200);
+      border-radius: 100px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+    .panel-progress-bar {
+      height: 100%;
+      border-radius: 100px;
+      background: linear-gradient(90deg, var(--accent), #7b2ff7);
+    }
+    .panel-meta { font-size: 0.78rem; color: var(--gray-400); }
+
+    .findings-list { display: flex; flex-direction: column; gap: 10px; }
+    .finding-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.82rem;
+    }
+    .finding-label { color: var(--gray-600); }
+    .finding-count {
+      font-weight: 700;
+      padding: 2px 10px;
+      border-radius: 100px;
+      font-size: 0.78rem;
+    }
+    .count-red { background: #fff0f0; color: #e53e3e; }
+    .count-orange { background: #fff7ed; color: #c05621; }
+    .count-yellow { background: #fffff0; color: #b7791f; }
+    .count-green { background: var(--green-light); color: var(--green); }
+
+    /* ── WHY US ── */
+    #why { background: var(--black); color: var(--white); }
+    #why .section-label { color: rgba(255,255,255,0.35); }
+    #why .section-title { color: var(--white); }
+    #why .section-sub { color: rgba(255,255,255,0.45); }
+    .why-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1px;
+      margin-top: 60px;
+      background: rgba(255,255,255,0.07);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .why-card { background: var(--black); padding: 40px; transition: background var(--transition); }
+    .why-card:hover { background: #0f0f0f; }
+    .why-stat { font-size: 2.8rem; font-weight: 700; letter-spacing: -0.04em; color: var(--white); line-height: 1; margin-bottom: 8px; }
+    .why-stat span { color: var(--accent); }
+    .why-card h4 { font-size: 0.95rem; font-weight: 600; color: rgba(255,255,255,0.8); margin-bottom: 10px; }
+    .why-card p { font-size: 0.875rem; color: rgba(255,255,255,0.38); line-height: 1.65; }
+
+    /* certifications */
+    .certs-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 48px;
+    }
+    .cert-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 10px 18px;
+      border-radius: 100px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: rgba(255,255,255,0.65);
+      transition: background var(--transition), border-color var(--transition);
+    }
+    .cert-chip:hover { background: rgba(0,87,255,0.12); border-color: var(--accent); color: var(--white); }
+    .cert-chip span { color: var(--accent); font-size: 1rem; }
+
+    /* ── TESTIMONIALS ── */
+    #testimonials { background: var(--white); }
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      margin-top: 60px;
+    }
+    .testimonial {
+      background: var(--gray-50);
+      border-radius: var(--radius);
+      padding: 36px;
+      border: 1px solid var(--gray-100);
+      transition: box-shadow var(--transition), transform var(--transition);
+    }
+    .testimonial:hover { box-shadow: 0 16px 48px rgba(0,0,0,0.07); transform: translateY(-4px); }
+    .stars { font-size: 0.85rem; letter-spacing: 2px; margin-bottom: 20px; color: #f6ad55; }
+    .testimonial blockquote { font-size: 0.97rem; line-height: 1.7; color: var(--gray-800); margin-bottom: 28px; font-style: italic; }
+    .testimonial-author { display: flex; align-items: center; gap: 14px; }
+    .avatar {
+      width: 42px; height: 42px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), #7b2ff7);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem; font-weight: 700; color: var(--white); flex-shrink: 0;
+    }
+    .author-info .name { font-size: 0.92rem; font-weight: 600; }
+    .author-info .role { font-size: 0.8rem; color: var(--gray-400); }
+    .author-info .company-tag {
+      display: inline-block;
+      background: var(--accent-light);
+      color: var(--accent);
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 100px;
+      margin-top: 4px;
+    }
+
+    /* ── CTA ── */
+    #contact {
+      background: linear-gradient(135deg, #f0f5ff 0%, #e8efff 100%);
+      text-align: center;
+      padding: 120px 5%;
+    }
+    #contact .section-title { margin: 0 auto 20px; color: var(--black); }
+    #contact .section-sub { margin: 0 auto 48px; }
+    .cta-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+    /* Discovery form */
+    #discovery-form { max-width: 660px; margin: 0 auto; text-align: left; }
+    .form-row { display: flex; gap: 16px; }
+    .form-row .form-group { flex: 1; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+    .form-group label { font-size: 13px; font-weight: 600; color: var(--gray-800); letter-spacing: 0.02em; }
+    .form-group input, .form-group textarea {
+      padding: 12px 14px; border: 1.5px solid var(--gray-200); border-radius: 10px;
+      font-size: 14px; font-family: inherit; color: var(--black); background: var(--white);
+      transition: border-color var(--transition), box-shadow var(--transition);
+      outline: none; width: 100%;
+    }
+    .form-group input:focus, .form-group textarea:focus {
+      border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,87,255,0.1);
+    }
+    .form-group textarea { resize: vertical; min-height: 100px; }
+    .form-actions { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 8px; }
+    @media (max-width: 560px) { .form-row { flex-direction: column; } }
+
+    /* ── FOOTER ── */
+    footer { background: var(--black); color: rgba(255,255,255,0.4); padding: 60px 5% 40px; }
+    .footer-top {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      padding-bottom: 48px; border-bottom: 1px solid rgba(255,255,255,0.08);
+      gap: 40px; flex-wrap: wrap;
+    }
+    .footer-logo {
+      font-size: 1.1rem; font-weight: 700; letter-spacing: -0.02em;
+      color: var(--white); text-decoration: none; display: block; margin-bottom: 12px;
+    }
+    .footer-logo span { color: var(--accent); }
+    .footer-tagline { font-size: 0.85rem; max-width: 240px; line-height: 1.6; }
+    .footer-links { display: flex; gap: 60px; flex-wrap: wrap; }
+    .footer-col h5 {
+      font-size: 0.78rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+      color: rgba(255,255,255,0.6); margin-bottom: 16px;
+    }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-col a {
+      text-decoration: none; font-size: 0.875rem; color: rgba(255,255,255,0.35);
+      transition: color var(--transition);
+    }
+    .footer-col a:hover { color: var(--white); }
+    .footer-bottom {
+      display: flex; justify-content: space-between; align-items: center;
+      padding-top: 32px; font-size: 0.8rem; flex-wrap: wrap; gap: 12px;
+    }
+    .footer-bottom a { color: rgba(255,255,255,0.35); text-decoration: none; }
+    .footer-bottom a:hover { color: var(--white); }
+    .sn-partner-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(0,87,255,0.15); border: 1px solid rgba(0,87,255,0.3);
+      padding: 6px 14px; border-radius: 100px; font-size: 0.78rem;
+      font-weight: 600; color: #4d8eff;
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.4; }
+    }
+    .reveal {
+      opacity: 0; transform: translateY(30px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .process-layout { grid-template-columns: 1fr; gap: 40px; }
+      .process-panel { position: static; }
+      .footer-links { gap: 32px; }
+    }
+    @media (max-width: 640px) {
+      nav { padding: 18px 6%; }
+      .nav-links { display: none; }
+      section { padding: 80px 6%; }
+      .hero { padding: 110px 6% 70px; }
+      .footer-top { flex-direction: column; }
+      .footer-bottom { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav id="navbar">
+    <a href="#" class="logo">Now<span>Projects</span></a>
+    <ul class="nav-links">
+      <li><a href="#products">Solutions</a></li>
+      <li><a href="#process">Our Process</a></li>
+      <li><a href="#why">Why Us</a></li>
+      <li><a href="#contact" class="nav-cta">Start a Project</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <p class="hero-ai-badge" style="display:inline-flex;align-items:center;gap:0.4rem;background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.4);border-radius:999px;padding:0.3rem 0.9rem;font-size:0.8rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:#a5b4fc;margin-bottom:1rem;">⚡ AI-Driven Automation</p>
+<h1>Secure your enterprise with <em>ServiceNow SecOps.</em></h1>
+    <p class="hero-sub">NowProjects specializes in implementing ServiceNow Security Operations, from Vulnerability Response and GRC to Config Compliance and beyond.</p>
+    <div class="hero-actions">
+      <a href="#contact" class="btn-primary">Book a Discovery Call →</a>
+      <a href="#products" class="btn-secondary">Explore our solutions</a>
+    </div>
+    <div class="product-pills">
+      <span class="pill">Vulnerability Response</span>
+      <span class="pill">GRC</span>
+      <span class="pill">Security Incident Response</span>
+      <span class="pill">Config Compliance</span>
+      <span class="pill">Risk Management</span>
+      <span class="pill">Threat Intelligence</span>
+      <span class="pill">Audit Management</span>
+      <span class="pill">TPRM</span>
+      <span class="pill">Claude Code</span>
+    </div>
+  </section>
+
+  <!-- TRUST STRIP -->
+  <div class="trust-strip">
+    <p>Trusted by</p>
+    <span class="trust-divider">|</span>
+    <span class="trust-item">Fortune 500 Enterprises</span>
+    <span class="trust-divider">·</span>
+    <span class="trust-item">Federal Agencies</span>
+    <span class="trust-divider">·</span>
+    <span class="trust-item">Healthcare Systems</span>
+    <span class="trust-divider">·</span>
+    <span class="trust-item">Financial Institutions</span>
+    <span class="trust-divider">·</span>
+    <span class="trust-item">Technology Companies</span>
+  </div>
+
+  <!-- PRODUCTS / SOLUTIONS -->
+  <section id="products">
+    <div class="reveal">
+      <p class="section-label">ServiceNow Solutions</p>
+      <h2 class="section-title">Everything you need to operationalize security at scale.</h2>
+      <p class="section-sub">We implement, configure, and optimize the full ServiceNow SecOps and GRC suite, tailored to your organization's risk posture.</p>
+    </div>
+    <div class="products-grid reveal">
+
+      <div class="product-card featured">
+        <span class="product-icon">🛡️</span>
+        <div class="product-tag" style="background:rgba(0,87,255,0.2);color:#4d8eff;">Core Offering</div>
+        <h3>Vulnerability Response (VR)</h3>
+        <p>Eliminate the gap between IT and Security. We implement VR to automatically prioritize, assign, and track remediation of vulnerabilities, connecting scanner data directly to CMDB.</p>
+        <ul class="product-features">
+          <li>Third-party scanner integrations (Tenable, Qualys, Rapid7)</li>
+          <li>Automated risk scoring & prioritization workflows</li>
+          <li>SLA tracking and executive dashboards</li>
+          <li>CMDB-driven asset attribution</li>
+        </ul>
+      </div>
+
+      <div class="product-card">
+        <span class="product-icon">📋</span>
+        <div class="product-tag">GRC</div>
+        <h3>Governance, Risk & Compliance</h3>
+        <p>Build a unified GRC program on ServiceNow. We implement Policy & Compliance Management, Risk Management, and Audit Management, mapped to your regulatory frameworks.</p>
+        <ul class="product-features">
+          <li>NIST, ISO 27001, SOC 2, HIPAA, FedRAMP mapping</li>
+          <li>Continuous control monitoring and attestation</li>
+          <li>Risk registers with heat maps & scoring</li>
+          <li>Audit workflow automation</li>
+        </ul>
+      </div>
+
+      <div class="product-card">
+        <span class="product-icon">⚙️</span>
+        <div class="product-tag green">Compliance</div>
+        <h3>Configuration Compliance</h3>
+        <p>Automate the detection and remediation of misconfigured assets. We implement CC to continuously assess your environment against CIS Benchmarks and internal policies.</p>
+        <ul class="product-features">
+          <li>CIS Benchmark & DISA STIG integration</li>
+          <li>Real-time configuration drift detection</li>
+          <li>Automated remediation task creation</li>
+          <li>Compliance posture reporting</li>
+        </ul>
+      </div>
+
+      <div class="product-card">
+        <span class="product-icon">🚨</span>
+        <div class="product-tag">SecOps</div>
+        <h3>Security Incident Response (SIR)</h3>
+        <p>Accelerate your SOC with structured, automated incident response workflows. We configure SIR to reduce MTTR and give analysts the context they need to act fast.</p>
+        <ul class="product-features">
+          <li>SIEM & SOAR integrations (Splunk, Sentinel, QRadar)</li>
+          <li>Automated triage and playbook execution</li>
+          <li>Threat Intelligence integration</li>
+          <li>Post-incident reporting & lessons learned</li>
+        </ul>
+      </div>
+
+      <div class="product-card">
+        <span class="product-icon">🔗</span>
+        <div class="product-tag green">Risk</div>
+        <h3>Third-Party Risk Management</h3>
+        <p>Extend your security posture to vendors and suppliers. We implement TPRM to automate vendor assessments, track findings, and ensure continuous monitoring.</p>
+        <ul class="product-features">
+          <li>Automated vendor onboarding questionnaires</li>
+          <li>Risk tiering and inherent risk scoring</li>
+          <li>Remediation tracking and evidence collection</li>
+          <li>Contract and vendor profile management</li>
+        </ul>
+      </div>
+
+      <div class="product-card">
+        <span class="product-icon">🔍</span>
+        <div class="product-tag">Advisory</div>
+        <h3>Health Checks & Optimization</h3>
+        <p>Already on ServiceNow SecOps but not getting the value you expected? We audit your existing instance, identify gaps, and tune configurations for maximum ROI.</p>
+        <ul class="product-features">
+          <li>Instance health assessment & scoring</li>
+          <li>Workflow and integration audit</li>
+          <li>CMDB data quality remediation</li>
+          <li>Upgrade readiness planning</li>
+        </ul>
+      </div>
+
+      <div class="product-card featured">
+        <span class="product-icon">🤖</span>
+        <div class="product-tag" style="background:rgba(124,58,237,0.2);color:#a78bfa;">AI-Powered</div>
+        <h3>Claude Code: AI-Accelerated Development</h3>
+        <p>We use Claude Code to scale ServiceNow development and administration, delivering more configurations, automations, and integrations in less time, with fewer errors.</p>
+        <ul class="product-features">
+          <li>AI-assisted script and flow development</li>
+          <li>Rapid prototyping of custom integrations</li>
+          <li>Automated code review and quality checks</li>
+          <li>Faster admin tasks and platform management</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- PROCESS -->
+  <section id="process">
+    <div class="process-layout">
+      <div class="reveal">
+        <p class="section-label">Implementation Methodology</p>
+        <h2 class="section-title">A proven path from kickoff to go-live.</h2>
+        <p class="section-sub">Our structured delivery model gets you live faster, without the rework that comes from skipping steps.</p>
+        <div class="process-steps" style="margin-top:40px;">
+          <div class="step">
+            <div class="step-num">01</div>
+            <div class="step-content">
+              <h4>Discovery & Current State</h4>
+              <p>We assess your existing security tooling, CMDB health, integrations, and team workflows to understand what we're building on, and what needs to change first.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">02</div>
+            <div class="step-content">
+              <h4>Design & Architecture</h4>
+              <p>We design your ServiceNow configuration (data model, workflows, integrations, roles, and dashboards) and get stakeholder sign-off before building anything.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">03</div>
+            <div class="step-content">
+              <h4>Agile Build & Configure</h4>
+              <p>Two-week sprints with working demos every cycle. You see progress continuously, and course-correction is built into the process, not bolted on at the end.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">04</div>
+            <div class="step-content">
+              <h4>Testing & UAT</h4>
+              <p>Rigorous functional testing, integration validation, and guided user acceptance testing with your security and IT teams before any production deployment.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">05</div>
+            <div class="step-content">
+              <h4>Go-Live & Enablement</h4>
+              <p>Controlled production cutover, real-time monitoring during hyper-care, and comprehensive training so your team owns the platform from day one.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="process-panel reveal">
+        <div class="panel-card">
+          <div class="panel-card-header">
+            <h5>VR Implementation · Sprint 3 of 5</h5>
+            <span class="status-badge status-green">On Track</span>
+          </div>
+          <div class="panel-progress">
+            <div class="panel-progress-bar" style="width: 62%;"></div>
+          </div>
+          <p class="panel-meta">62% complete · Est. go-live in 4 weeks</p>
+        </div>
+
+        <div class="panel-card">
+          <div class="panel-card-header">
+            <h5>Vulnerability Findings</h5>
+            <span class="status-badge status-blue">Live Data</span>
+          </div>
+          <div class="findings-list">
+            <div class="finding-row">
+              <span class="finding-label">Critical</span>
+              <span class="finding-count count-red">24</span>
+            </div>
+            <div class="finding-row">
+              <span class="finding-label">High</span>
+              <span class="finding-count count-orange">187</span>
+            </div>
+            <div class="finding-row">
+              <span class="finding-label">Medium</span>
+              <span class="finding-count count-yellow">612</span>
+            </div>
+            <div class="finding-row">
+              <span class="finding-label">Remediated (30d)</span>
+              <span class="finding-count count-green">+341</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-card">
+          <div class="panel-card-header">
+            <h5>Compliance Posture · GRC</h5>
+            <span class="status-badge status-green">Improving</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:0.78rem;margin-bottom:5px;">
+                <span style="color:var(--gray-600);">NIST CSF</span>
+                <span style="font-weight:600;">78%</span>
+              </div>
+              <div class="panel-progress"><div class="panel-progress-bar" style="width:78%;"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:0.78rem;margin-bottom:5px;">
+                <span style="color:var(--gray-600);">ISO 27001</span>
+                <span style="font-weight:600;">64%</span>
+              </div>
+              <div class="panel-progress"><div class="panel-progress-bar" style="width:64%;"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:0.78rem;margin-bottom:5px;">
+                <span style="color:var(--gray-600);">SOC 2 Type II</span>
+                <span style="font-weight:600;">91%</span>
+              </div>
+              <div class="panel-progress"><div class="panel-progress-bar" style="width:91%;background:linear-gradient(90deg,var(--green),#00d4a0);"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY US -->
+  <section id="why">
+    <div class="reveal">
+      <p class="section-label">Why NowProjects</p>
+      <h2 class="section-title" style="color:var(--white);">ServiceNow SecOps, done right.</h2>
+      <p class="section-sub" style="color:rgba(255,255,255,0.45);">We've seen what bad implementations look like. We build the right way, with CMDB integrity, clean integrations, and workflows your team will actually use.</p>
+    </div>
+    <div class="why-grid reveal">
+      <div class="why-card">
+        <div class="why-stat">40<span>+</span></div>
+        <h4>SecOps implementations</h4>
+        <p>Across VR, SIR, GRC, Config Compliance, and TPRM, in regulated and non-regulated industries.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-stat">60<span>%</span></div>
+        <h4>Faster time to value</h4>
+        <p>Our accelerators, pre-built integrations, and Claude Code-powered development cut typical project timelines significantly.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-stat">100<span>%</span></div>
+        <h4>Certified consultants</h4>
+        <p>Every consultant on your project holds active ServiceNow certifications in the relevant product areas.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-stat">3<span>yr</span></div>
+        <h4>Average client relationship</h4>
+        <p>We don't just implement and leave. Our clients keep us as a trusted partner for ongoing optimization.</p>
+      </div>
+    </div>
+    <div class="certs-row reveal">
+      <div class="cert-chip"><span>✓</span> ServiceNow Certified Implementation Specialist: SecOps</div>
+      <div class="cert-chip"><span>✓</span> CIS: GRC</div>
+      <div class="cert-chip"><span>✓</span> CIS: Vulnerability Response</div>
+      <div class="cert-chip"><span>✓</span> CISSP</div>
+      <div class="cert-chip"><span>✓</span> CISM</div>
+      <div class="cert-chip"><span>✓</span> ServiceNow Partner</div>
+      <div class="cert-chip"><span>✓</span> Claude Code: AI-Powered Development & Administration</div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section id="contact">
+    <div class="reveal">
+      <h2 class="section-title" style="max-width:580px;">Ready to take control of your security posture?</h2>
+      <p class="section-sub">Tell us about your ServiceNow environment and security goals. We'll come back with a clear, honest assessment and a proposed path forward.</p>
+
+      <form id="discovery-form" name="discovery-call" method="POST" action="https://formsubmit.co/hello@nowprojects.ai">
+        <input type="hidden" name="_subject" value="New Discovery Call Request: NowProjects"/>
+        <input type="hidden" name="_template" value="table"/>
+        <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off"/>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="f-name">Full Name *</label>
+            <input type="text" id="f-name" name="name" placeholder="Jane Smith" required/>
+          </div>
+          <div class="form-group">
+            <label for="f-email">Work Email *</label>
+            <input type="email" id="f-email" name="email" placeholder="jane@company.com" required/>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="f-company">Company</label>
+            <input type="text" id="f-company" name="company" placeholder="Acme Corp"/>
+          </div>
+          <div class="form-group">
+            <label for="f-role">Your Role</label>
+            <input type="text" id="f-role" name="role" placeholder="CISO, Security Engineer..."/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="f-message">What are you looking to solve? *</label>
+          <textarea id="f-message" name="message" rows="4" placeholder="Tell us about your ServiceNow environment, current challenges, or what you'd like to achieve..." required></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn-primary" id="form-submit-btn">Book a Discovery Call →</button>
+          <a href="https://linkedin.com/company/nowprojects" target="_blank" rel="noopener" class="btn-secondary">View our LinkedIn</a>
+        </div>
+        <p id="form-success" style="display:none; color:var(--green); font-weight:600; margin-top:16px;">✓ Message sent! We'll be in touch within 1 business day.</p>
+      </form>
+
+      <script>
+        const form = document.getElementById('discovery-form');
+        form.addEventListener('submit', async e => {
+          e.preventDefault();
+          const btn = document.getElementById('form-submit-btn');
+          btn.textContent = 'Sending...';
+          btn.disabled = true;
+          try {
+            const res = await fetch('https://formsubmit.co/ajax/hello@nowprojects.ai', {
+              method: 'POST',
+              headers: { 'Accept': 'application/json' },
+              body: new FormData(form)
+            });
+            if (res.ok) {
+              form.reset();
+              document.getElementById('form-success').style.display = 'block';
+              btn.textContent = '✓ Sent!';
+            } else {
+              throw new Error('bad response');
+            }
+          } catch {
+            btn.textContent = 'Book a Discovery Call →';
+            btn.disabled = false;
+            document.getElementById('form-success').style.display = 'block';
+            document.getElementById('form-success').style.color = '#e53e3e';
+            document.getElementById('form-success').innerHTML = 'Something went wrong. Please email <a href="mailto:hello@nowprojects.ai">hello@nowprojects.ai</a> directly.';
+          }
+        });
+      </script>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-top">
+      <div>
+        <a href="#" class="footer-logo">Now<span>Projects</span></a>
+        <p class="footer-tagline">ServiceNow SecOps & GRC implementation specialists.</p>
+        <div style="margin-top:16px;">
+          <span class="sn-partner-badge">✦ ServiceNow Partner</span>
+        </div>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col">
+          <h5>Solutions</h5>
+          <ul>
+            <li><a href="#products">Vulnerability Response</a></li>
+            <li><a href="#products">GRC</a></li>
+            <li><a href="#products">Config Compliance</a></li>
+            <li><a href="#products">Security Incident Response</a></li>
+            <li><a href="#products">Third-Party Risk</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>Company</h5>
+          <ul>
+            <li><a href="#process">Methodology</a></li>
+            <li><a href="#why">Why NowProjects</a></li>
+            <li><a href="#testimonials">Case Studies</a></li>
+            <li><a href="https://linkedin.com/company/nowprojects" target="_blank" rel="noopener">LinkedIn</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>Contact</h5>
+          <ul>
+            <li><a href="mailto:hello@nowprojects.ai">hello@nowprojects.ai</a></li>
+            <li><a href="#contact">Book a Call</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 NowProjects. All rights reserved.</span>
+      <div style="display:flex;gap:24px;">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 20);
+    });
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('visible');
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -60px 0px' });
+    reveals.forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
