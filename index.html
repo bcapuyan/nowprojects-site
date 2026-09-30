@@ -1,1099 +1,474 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NowProjects | ServiceNow SecOps & GRC Implementation</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="ServiceNow Vulnerability Response consulting for platform owners: deployment maturity, compliance alignment, and fixing customizations.">
+<title>NowProjects.ai Vulnerability Response</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: single column editorial flow, hero with a sample assessment scorecard, sections alternate plain ground and a tinted band */
+:root{
+  --bg:#f6f8fc; --surface:#ffffff; --band:#eaf0fb; --ink:#0b1426; --muted:#4f5b73; --line:#d6deec;
+  --accent:#0057ff; --accent-ink:#ffffff; --accent-soft:#e3ebff;
+  --crit:#c8242f; --high:#d9661b; --med:#b88a00; --ok:#00936a;
+  --crit-soft:#fbe6e7; --high-soft:#fcebdf; --med-soft:#faf1d2; --ok-soft:#dcf3ea;
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Inter", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, Consolas, monospace;
+  --r:12px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0a1120; --surface:#111a2e; --band:#0f1830; --ink:#e8eefb; --muted:#9aa8c3; --line:#23304d;
+  --accent:#4d8bff; --accent-ink:#06101f; --accent-soft:#16264a;
+  --crit:#ff6b73; --high:#ff9a57; --med:#e6be3c; --ok:#3ad2a0;
+  --crit-soft:#3a1a1f; --high-soft:#3a2416; --med-soft:#352c10; --ok-soft:#0f3328;
+  color-scheme:dark; } }
+:root[data-theme="dark"]{
+  --bg:#0a1120; --surface:#111a2e; --band:#0f1830; --ink:#e8eefb; --muted:#9aa8c3; --line:#23304d;
+  --accent:#4d8bff; --accent-ink:#06101f; --accent-soft:#16264a;
+  --crit:#ff6b73; --high:#ff9a57; --med:#e6be3c; --ok:#3ad2a0;
+  --crit-soft:#3a1a1f; --high-soft:#3a2416; --med-soft:#352c10; --ok-soft:#0f3328;
+  color-scheme:dark; }
 
-    :root {
-      --black: #0a0a0a;
-      --white: #ffffff;
-      --gray-50: #f9f9f9;
-      --gray-100: #f0f0f0;
-      --gray-200: #e0e0e0;
-      --gray-400: #9a9a9a;
-      --gray-600: #555555;
-      --gray-800: #1e1e1e;
-      --accent: #0057ff;
-      --accent-dark: #0040cc;
-      --accent-light: #e8efff;
-      --green: #00b37e;
-      --green-light: #e6f7f1;
-      --radius: 16px;
-      --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6;}
+a{color:var(--accent)}
+.wrap{max-width:1120px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--f-display);line-height:1.1;text-wrap:balance;margin:0}
+h2{font-size:clamp(28px,4vw,42px);font-weight:700;letter-spacing:-.01em}
+h3{font-size:20px;font-weight:700}
+p{margin:0}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:500}
+.lede{color:var(--muted);font-size:18px;max-width:62ch}
+.mono{font-family:var(--f-mono);font-size:.88em}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
 
-    html { scroll-behavior: smooth; }
+/* nav */
+header.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:14px}
+.brand{font-family:var(--f-display);font-weight:800;font-size:20px;color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:10px}
+.brand small{font-family:var(--f-mono);font-weight:500;font-size:11px;color:var(--accent);background:var(--accent-soft);padding:3px 8px;border-radius:99px;letter-spacing:.04em}
+.nav ul{display:flex;gap:22px;list-style:none;margin:0;padding:0;font-size:14px}
+.nav ul a{color:var(--muted);text-decoration:none;font-weight:500}
+.nav ul a:hover{color:var(--ink)}
+.btn{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:15px;padding:12px 20px;border-radius:10px;text-decoration:none;border:1px solid transparent;cursor:pointer;font-family:var(--f-body)}
+.btn-primary{background:var(--accent);color:var(--accent-ink)}
+.btn-primary:hover{filter:brightness(1.08)}
+.btn-ghost{border-color:var(--line);color:var(--ink);background:var(--surface)}
+.btn-sm{padding:8px 14px;font-size:14px}
+@media (max-width:860px){.nav ul{display:none}}
 
-    body {
-      font-family: 'Inter', system-ui, sans-serif;
-      background: var(--white);
-      color: var(--black);
-      line-height: 1.6;
-      overflow-x: hidden;
-      -webkit-font-smoothing: antialiased;
-    }
+/* hero */
+.hero{padding-block:72px 64px}
+.hero .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:56px;align-items:center}
+.hero h1{font-size:clamp(38px,5.6vw,64px);font-weight:800;letter-spacing:-.02em;margin-block:14px 20px}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero .ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+.hero .who{margin-top:22px;font-size:14px;color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+.score{padding:22px;box-shadow:0 20px 50px -30px color-mix(in srgb,var(--accent) 45%,transparent)}
+.score-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:6px}
+.score-head b{font-family:var(--f-display);font-size:17px}
+.tag{font-family:var(--f-mono);font-size:11px;color:var(--muted);border:1px dashed var(--line);padding:2px 8px;border-radius:6px;white-space:nowrap}
+.row{display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:center;padding-block:10px;border-bottom:1px solid var(--line);font-size:14px}
+.row:last-of-type{border-bottom:0}
+.row .v{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-weight:500}
+.pill{font-family:var(--f-mono);font-size:11px;font-weight:500;padding:3px 9px;border-radius:99px;white-space:nowrap}
+.p-crit{background:var(--crit-soft);color:var(--crit)}
+.p-high{background:var(--high-soft);color:var(--high)}
+.p-med{background:var(--med-soft);color:var(--med)}
+.p-ok{background:var(--ok-soft);color:var(--ok)}
+.meter{margin-top:14px;padding:14px;background:var(--band);border-radius:10px}
+.meter .lbl{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:8px}
+.meter .lbl b{color:var(--ink);font-family:var(--f-display)}
+.steps5{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+.steps5 span{height:8px;border-radius:3px;background:var(--line)}
+.steps5 span.on{background:var(--accent)}
+@media (max-width:900px){.hero .wrap{grid-template-columns:1fr;gap:40px}.hero{padding-block:48px}}
 
-    /* ── NAV ── */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 22px 5%;
-      background: rgba(255,255,255,0.88);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-bottom: 1px solid rgba(0,0,0,0.06);
-      transition: box-shadow var(--transition);
-    }
-    nav.scrolled { box-shadow: 0 2px 24px rgba(0,0,0,0.07); }
+/* symptoms */
+.symptoms{border-block:1px solid var(--line);background:var(--surface)}
+.symptoms .wrap{padding-block:28px;display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:start}
+.symptoms ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 28px;font-size:15px}
+.symptoms li{padding-left:18px;position:relative;color:var(--muted)}
+.symptoms li::before{content:"";position:absolute;left:0;top:.62em;width:8px;height:8px;border-radius:2px;background:var(--crit)}
+@media (max-width:700px){.symptoms .wrap{grid-template-columns:1fr;gap:14px}}
 
-    .logo {
-      font-size: 1.1rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      color: var(--black);
-      text-decoration: none;
-    }
-    .logo span { color: var(--accent); }
+section.sec{padding-block:88px}
+section.band{background:var(--band)}
+.sec-head{display:grid;gap:14px;margin-bottom:44px;max-width:760px}
 
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 32px;
-      list-style: none;
-    }
-    .nav-links a {
-      text-decoration: none;
-      font-size: 0.88rem;
-      font-weight: 500;
-      color: var(--gray-600);
-      transition: color var(--transition);
-    }
-    .nav-links a:hover { color: var(--black); }
+/* maturity */
+.ladder{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;align-items:end}
+.rung{all:unset;box-sizing:border-box;cursor:pointer;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;justify-content:space-between;gap:18px;transition:border-color .2s,transform .2s}
+.rung:hover{border-color:var(--accent)}
+.rung:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.rung[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.rung[aria-selected="true"] .lv{color:var(--accent-ink);opacity:.8}
+.rung .lv{font-family:var(--f-mono);font-size:12px;color:var(--accent)}
+.rung .nm{font-family:var(--f-display);font-weight:700;font-size:19px}
+.rung:nth-child(1){min-height:110px}.rung:nth-child(2){min-height:135px}.rung:nth-child(3){min-height:160px}.rung:nth-child(4){min-height:185px}.rung:nth-child(5){min-height:210px}
+.detail{margin-top:18px;padding:28px;display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:28px}
+.detail h3{font-size:24px;margin-bottom:8px}
+.detail h4{font-family:var(--f-mono);font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 10px;font-weight:500}
+.detail ul{margin:0;padding-left:18px;display:grid;gap:6px;font-size:15px}
+@media (max-width:860px){.ladder{grid-template-columns:1fr 1fr}.rung{min-height:0!important}.rung:nth-child(5){grid-column:1/-1}.detail{grid-template-columns:1fr}}
 
-    .nav-cta {
-      background: var(--black) !important;
-      color: var(--white) !important;
-      padding: 10px 22px;
-      border-radius: 100px;
-      font-weight: 600 !important;
-      font-size: 0.85rem !important;
-      transition: background var(--transition), transform var(--transition) !important;
-    }
-    .nav-cta:hover { background: var(--accent) !important; transform: translateY(-1px); }
+/* self check */
+.check{margin-top:28px;padding:28px;display:grid;grid-template-columns:1.4fr 1fr;gap:36px}
+.qs{display:grid;gap:8px}
+.q{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:10px 0;border-bottom:1px solid var(--line);font-size:15px}
+.q:last-child{border-bottom:0}
+.yn{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;flex-shrink:0}
+.yn button{all:unset;cursor:pointer;font-size:13px;font-weight:600;padding:6px 12px;color:var(--muted)}
+.yn button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.yn button[aria-pressed="true"].y{background:var(--ok-soft);color:var(--ok)}
+.yn button[aria-pressed="true"].n{background:var(--crit-soft);color:var(--crit)}
+.result{background:var(--band);border-radius:10px;padding:24px;display:flex;flex-direction:column;gap:14px;align-self:start;position:sticky;top:90px}
+.result .big{font-family:var(--f-display);font-size:56px;font-weight:800;line-height:1;color:var(--accent)}
+.result .big small{font-size:20px;color:var(--muted);font-weight:500}
+@media (max-width:860px){.check{grid-template-columns:1fr}.result{position:static}}
 
-    /* ── HERO ── */
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 130px 5% 90px;
-      background: linear-gradient(160deg, #f0f5ff 0%, #ffffff 55%);
-      position: relative;
-      overflow: hidden;
-    }
-    .hero::before {
-      content: '';
-      position: absolute;
-      top: -180px; right: -180px;
-      width: 640px; height: 640px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(0,87,255,0.07) 0%, transparent 70%);
-      pointer-events: none;
-    }
-    .hero::after {
-      content: '';
-      position: absolute;
-      bottom: -80px; left: -120px;
-      width: 480px; height: 480px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(0,179,126,0.05) 0%, transparent 70%);
-      pointer-events: none;
-    }
+/* services */
+.svc{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+.svc .card{padding:28px;display:flex;flex-direction:column;gap:14px}
+.svc .meta{display:flex;flex-wrap:wrap;gap:8px}
+.svc .meta span{font-family:var(--f-mono);font-size:12px;background:var(--accent-soft);color:var(--accent);padding:3px 9px;border-radius:6px}
+.svc ul{margin:0;padding-left:18px;color:var(--muted);font-size:15px;display:grid;gap:4px}
+.svc .card.feature{border:2px solid var(--accent)}
+.logos{margin-top:22px;display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;font-size:14px;color:var(--muted)}
+.logos span.src{font-family:var(--f-mono);font-size:13px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:4px 10px;border-radius:6px}
+@media (max-width:760px){.svc{grid-template-columns:1fr}}
 
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--accent-light);
-      color: var(--accent);
-      font-size: 0.78rem;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      padding: 7px 16px;
-      border-radius: 100px;
-      margin-bottom: 28px;
-      animation: fadeUp 0.6s ease both;
-    }
-    .badge-dot {
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: var(--accent);
-      animation: pulse 2s ease infinite;
-    }
+/* compliance table */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:720px;font-size:15px}
+th,td{text-align:left;padding:14px 18px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--f-mono);font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:500;background:var(--band)}
+tr:last-child td{border-bottom:0}
+td:first-child{font-weight:600;white-space:nowrap}
+td .mono{color:var(--accent)}
+.note{margin-top:14px;font-size:13px;color:var(--muted)}
 
-    h1 {
-      font-size: clamp(2.6rem, 6vw, 5rem);
-      font-weight: 700;
-      letter-spacing: -0.03em;
-      line-height: 1.1;
-      max-width: 860px;
-      animation: fadeUp 0.6s 0.1s ease both;
-    }
-    h1 em { font-style: normal; color: var(--accent); }
+/* fixes */
+.fixes{display:grid;gap:12px}
+.fix{display:grid;grid-template-columns:1fr 28px 1fr auto;gap:18px;align-items:center;padding:20px 24px}
+.fix .lab{font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);display:block;margin-bottom:4px}
+.fix .arrow{color:var(--accent);font-size:22px;text-align:center}
+.fix p{font-size:15px}
+@media (max-width:800px){.fix{grid-template-columns:1fr}.fix .arrow{display:none}}
 
-    .hero-sub {
-      font-size: clamp(1rem, 2vw, 1.2rem);
-      color: var(--gray-600);
-      max-width: 560px;
-      margin: 24px auto 48px;
-      font-weight: 400;
-      animation: fadeUp 0.6s 0.2s ease both;
-    }
+/* process */
+.proc{display:grid;grid-template-columns:repeat(4,1fr);gap:0;counter-reset:s;border-top:2px solid var(--ink)}
+.proc div{padding:22px 20px 0 0;display:grid;gap:8px;align-content:start}
+.proc .n{font-family:var(--f-mono);font-size:13px;color:var(--accent)}
+.proc .wk{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.proc p{color:var(--muted);font-size:15px}
+@media (max-width:800px){.proc{grid-template-columns:1fr 1fr;row-gap:28px}}
 
-    .hero-actions {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      flex-wrap: wrap;
-      justify-content: center;
-      animation: fadeUp 0.6s 0.3s ease both;
-    }
+/* proof */
+.proof{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:40px}
+.proof div{border-left:2px solid var(--accent);padding-left:16px}
+.proof b{font-family:var(--f-display);font-size:34px;display:block;line-height:1.1}
+.proof span{color:var(--muted);font-size:14px}
+@media (max-width:760px){.proof{grid-template-columns:1fr 1fr}}
 
-    .btn-primary {
-      background: var(--black);
-      color: var(--white);
-      text-decoration: none;
-      padding: 15px 32px;
-      border-radius: 100px;
-      font-size: 0.95rem;
-      font-weight: 600;
-      transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
-    }
-    .btn-primary:hover {
-      background: var(--accent);
-      transform: translateY(-2px);
-      box-shadow: 0 12px 32px rgba(0,87,255,0.25);
-    }
-
-    .btn-secondary {
-      color: var(--gray-600);
-      text-decoration: none;
-      padding: 15px 32px;
-      border-radius: 100px;
-      font-size: 0.95rem;
-      font-weight: 500;
-      border: 1px solid var(--gray-200);
-      transition: border-color var(--transition), color var(--transition), transform var(--transition);
-    }
-    .btn-secondary:hover {
-      border-color: var(--black);
-      color: var(--black);
-      transform: translateY(-2px);
-    }
-
-    /* Product pills */
-    .product-pills {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-      margin-top: 56px;
-      animation: fadeUp 0.6s 0.4s ease both;
-    }
-    .pill {
-      background: var(--white);
-      border: 1px solid var(--gray-200);
-      color: var(--gray-600);
-      font-size: 0.8rem;
-      font-weight: 500;
-      padding: 7px 16px;
-      border-radius: 100px;
-      transition: border-color var(--transition), color var(--transition), box-shadow var(--transition);
-    }
-    .pill:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-      box-shadow: 0 4px 16px rgba(0,87,255,0.1);
-    }
-
-    /* trust strip */
-    .trust-strip {
-      background: var(--gray-50);
-      border-top: 1px solid var(--gray-100);
-      border-bottom: 1px solid var(--gray-100);
-      padding: 28px 5%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-    .trust-strip p {
-      font-size: 0.78rem;
-      font-weight: 600;
-      color: var(--gray-400);
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      white-space: nowrap;
-    }
-    .trust-divider { color: var(--gray-200); }
-    .trust-item {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--gray-600);
-    }
-
-    /* ── SECTION BASE ── */
-    section { padding: 100px 5%; }
-    .section-label {
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 16px;
-    }
-    .section-title {
-      font-size: clamp(1.8rem, 4vw, 3rem);
-      font-weight: 700;
-      letter-spacing: -0.03em;
-      line-height: 1.15;
-      max-width: 620px;
-    }
-    .section-sub {
-      color: var(--gray-600);
-      font-size: 1.05rem;
-      max-width: 520px;
-      margin-top: 16px;
-      line-height: 1.7;
-    }
-
-    /* ── PRODUCTS ── */
-    #products { background: var(--gray-50); }
-
-    .products-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 20px;
-      margin-top: 60px;
-    }
-
-    .product-card {
-      background: var(--white);
-      border-radius: var(--radius);
-      padding: 36px;
-      border: 1px solid var(--gray-100);
-      transition: box-shadow var(--transition), transform var(--transition), border-color var(--transition);
-      position: relative;
-      overflow: hidden;
-    }
-    .product-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, var(--accent), #7b2ff7);
-      opacity: 0;
-      transition: opacity var(--transition);
-    }
-    .product-card:hover {
-      box-shadow: 0 16px 48px rgba(0,0,0,0.08);
-      transform: translateY(-4px);
-      border-color: transparent;
-    }
-    .product-card:hover::before { opacity: 1; }
-
-    .product-tag {
-      display: inline-block;
-      background: var(--accent-light);
-      color: var(--accent);
-      font-size: 0.7rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      padding: 4px 10px;
-      border-radius: 100px;
-      margin-bottom: 20px;
-    }
-    .product-tag.green { background: var(--green-light); color: var(--green); }
-
-    .product-icon {
-      font-size: 2rem;
-      margin-bottom: 16px;
-      display: block;
-    }
-    .product-card h3 {
-      font-size: 1.15rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      margin-bottom: 12px;
-    }
-    .product-card p {
-      font-size: 0.9rem;
-      color: var(--gray-600);
-      line-height: 1.7;
-      margin-bottom: 20px;
-    }
-    .product-features {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .product-features li {
-      font-size: 0.85rem;
-      color: var(--gray-600);
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-    }
-    .product-features li::before {
-      content: '→';
-      color: var(--accent);
-      font-weight: 600;
-      flex-shrink: 0;
-      margin-top: 1px;
-    }
-
-    /* featured card */
-    .product-card.featured {
-      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
-      border-color: transparent;
-      color: var(--white);
-    }
-    .product-card.featured h3 { color: var(--white); }
-    .product-card.featured p { color: rgba(255,255,255,0.55); }
-    .product-card.featured .product-features li { color: rgba(255,255,255,0.6); }
-    .product-card.featured .product-features li::before { color: #4d8eff; }
-
-    /* ── PROCESS ── */
-    #process { background: var(--white); }
-    .process-layout {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 80px;
-      align-items: start;
-      margin-top: 60px;
-    }
-    .process-steps { display: flex; flex-direction: column; }
-    .step {
-      display: flex;
-      gap: 24px;
-      padding: 28px 0;
-      border-bottom: 1px solid var(--gray-100);
-    }
-    .step:last-child { border-bottom: none; }
-    .step:hover .step-num { background: var(--accent); color: var(--white); }
-    .step-num {
-      width: 36px; height: 36px; min-width: 36px;
-      border-radius: 50%;
-      background: var(--gray-100);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.8rem; font-weight: 700; color: var(--gray-600);
-      transition: var(--transition);
-    }
-    .step-content h4 { font-size: 1rem; font-weight: 600; margin-bottom: 6px; letter-spacing: -0.01em; }
-    .step-content p { font-size: 0.9rem; color: var(--gray-600); line-height: 1.6; }
-
-    .process-panel {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      position: sticky;
-      top: 100px;
-    }
-    .panel-card {
-      background: var(--gray-50);
-      border-radius: 14px;
-      padding: 24px;
-      border: 1px solid var(--gray-100);
-    }
-    .panel-card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 14px;
-    }
-    .panel-card h5 { font-size: 0.85rem; font-weight: 600; }
-    .status-badge {
-      font-size: 0.72rem;
-      font-weight: 600;
-      padding: 3px 10px;
-      border-radius: 100px;
-    }
-    .status-green { background: var(--green-light); color: var(--green); }
-    .status-blue { background: var(--accent-light); color: var(--accent); }
-    .panel-progress {
-      height: 6px;
-      background: var(--gray-200);
-      border-radius: 100px;
-      overflow: hidden;
-      margin-bottom: 8px;
-    }
-    .panel-progress-bar {
-      height: 100%;
-      border-radius: 100px;
-      background: linear-gradient(90deg, var(--accent), #7b2ff7);
-    }
-    .panel-meta { font-size: 0.78rem; color: var(--gray-400); }
-
-    .findings-list { display: flex; flex-direction: column; gap: 10px; }
-    .finding-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 0.82rem;
-    }
-    .finding-label { color: var(--gray-600); }
-    .finding-count {
-      font-weight: 700;
-      padding: 2px 10px;
-      border-radius: 100px;
-      font-size: 0.78rem;
-    }
-    .count-red { background: #fff0f0; color: #e53e3e; }
-    .count-orange { background: #fff7ed; color: #c05621; }
-    .count-yellow { background: #fffff0; color: #b7791f; }
-    .count-green { background: var(--green-light); color: var(--green); }
-
-    /* ── WHY US ── */
-    #why { background: var(--black); color: var(--white); }
-    #why .section-label { color: rgba(255,255,255,0.35); }
-    #why .section-title { color: var(--white); }
-    #why .section-sub { color: rgba(255,255,255,0.45); }
-    .why-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 1px;
-      margin-top: 60px;
-      background: rgba(255,255,255,0.07);
-      border-radius: var(--radius);
-      overflow: hidden;
-    }
-    .why-card { background: var(--black); padding: 40px; transition: background var(--transition); }
-    .why-card:hover { background: #0f0f0f; }
-    .why-stat { font-size: 2.8rem; font-weight: 700; letter-spacing: -0.04em; color: var(--white); line-height: 1; margin-bottom: 8px; }
-    .why-stat span { color: var(--accent); }
-    .why-card h4 { font-size: 0.95rem; font-weight: 600; color: rgba(255,255,255,0.8); margin-bottom: 10px; }
-    .why-card p { font-size: 0.875rem; color: rgba(255,255,255,0.38); line-height: 1.65; }
-
-    /* certifications */
-    .certs-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 48px;
-    }
-    .cert-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.1);
-      padding: 10px 18px;
-      border-radius: 100px;
-      font-size: 0.82rem;
-      font-weight: 500;
-      color: rgba(255,255,255,0.65);
-      transition: background var(--transition), border-color var(--transition);
-    }
-    .cert-chip:hover { background: rgba(0,87,255,0.12); border-color: var(--accent); color: var(--white); }
-    .cert-chip span { color: var(--accent); font-size: 1rem; }
-
-    /* ── TESTIMONIALS ── */
-    #testimonials { background: var(--white); }
-    .testimonials-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 24px;
-      margin-top: 60px;
-    }
-    .testimonial {
-      background: var(--gray-50);
-      border-radius: var(--radius);
-      padding: 36px;
-      border: 1px solid var(--gray-100);
-      transition: box-shadow var(--transition), transform var(--transition);
-    }
-    .testimonial:hover { box-shadow: 0 16px 48px rgba(0,0,0,0.07); transform: translateY(-4px); }
-    .stars { font-size: 0.85rem; letter-spacing: 2px; margin-bottom: 20px; color: #f6ad55; }
-    .testimonial blockquote { font-size: 0.97rem; line-height: 1.7; color: var(--gray-800); margin-bottom: 28px; font-style: italic; }
-    .testimonial-author { display: flex; align-items: center; gap: 14px; }
-    .avatar {
-      width: 42px; height: 42px; border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), #7b2ff7);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.9rem; font-weight: 700; color: var(--white); flex-shrink: 0;
-    }
-    .author-info .name { font-size: 0.92rem; font-weight: 600; }
-    .author-info .role { font-size: 0.8rem; color: var(--gray-400); }
-    .author-info .company-tag {
-      display: inline-block;
-      background: var(--accent-light);
-      color: var(--accent);
-      font-size: 0.68rem;
-      font-weight: 600;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      padding: 2px 8px;
-      border-radius: 100px;
-      margin-top: 4px;
-    }
-
-    /* ── CTA ── */
-    #contact {
-      background: linear-gradient(135deg, #f0f5ff 0%, #e8efff 100%);
-      text-align: center;
-      padding: 120px 5%;
-    }
-    #contact .section-title { margin: 0 auto 20px; color: var(--black); }
-    #contact .section-sub { margin: 0 auto 48px; }
-    .cta-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
-
-    /* Discovery form */
-    #discovery-form { max-width: 660px; margin: 0 auto; text-align: left; }
-    .form-row { display: flex; gap: 16px; }
-    .form-row .form-group { flex: 1; }
-    .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
-    .form-group label { font-size: 13px; font-weight: 600; color: var(--gray-800); letter-spacing: 0.02em; }
-    .form-group input, .form-group textarea {
-      padding: 12px 14px; border: 1.5px solid var(--gray-200); border-radius: 10px;
-      font-size: 14px; font-family: inherit; color: var(--black); background: var(--white);
-      transition: border-color var(--transition), box-shadow var(--transition);
-      outline: none; width: 100%;
-    }
-    .form-group input:focus, .form-group textarea:focus {
-      border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,87,255,0.1);
-    }
-    .form-group textarea { resize: vertical; min-height: 100px; }
-    .form-actions { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 8px; }
-    @media (max-width: 560px) { .form-row { flex-direction: column; } }
-
-    /* ── FOOTER ── */
-    footer { background: var(--black); color: rgba(255,255,255,0.4); padding: 60px 5% 40px; }
-    .footer-top {
-      display: flex; justify-content: space-between; align-items: flex-start;
-      padding-bottom: 48px; border-bottom: 1px solid rgba(255,255,255,0.08);
-      gap: 40px; flex-wrap: wrap;
-    }
-    .footer-logo {
-      font-size: 1.1rem; font-weight: 700; letter-spacing: -0.02em;
-      color: var(--white); text-decoration: none; display: block; margin-bottom: 12px;
-    }
-    .footer-logo span { color: var(--accent); }
-    .footer-tagline { font-size: 0.85rem; max-width: 240px; line-height: 1.6; }
-    .footer-links { display: flex; gap: 60px; flex-wrap: wrap; }
-    .footer-col h5 {
-      font-size: 0.78rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
-      color: rgba(255,255,255,0.6); margin-bottom: 16px;
-    }
-    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-    .footer-col a {
-      text-decoration: none; font-size: 0.875rem; color: rgba(255,255,255,0.35);
-      transition: color var(--transition);
-    }
-    .footer-col a:hover { color: var(--white); }
-    .footer-bottom {
-      display: flex; justify-content: space-between; align-items: center;
-      padding-top: 32px; font-size: 0.8rem; flex-wrap: wrap; gap: 12px;
-    }
-    .footer-bottom a { color: rgba(255,255,255,0.35); text-decoration: none; }
-    .footer-bottom a:hover { color: var(--white); }
-    .sn-partner-badge {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: rgba(0,87,255,0.15); border: 1px solid rgba(0,87,255,0.3);
-      padding: 6px 14px; border-radius: 100px; font-size: 0.78rem;
-      font-weight: 600; color: #4d8eff;
-    }
-
-    /* ── ANIMATIONS ── */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(24px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50%       { opacity: 0.4; }
-    }
-    .reveal {
-      opacity: 0; transform: translateY(30px);
-      transition: opacity 0.7s ease, transform 0.7s ease;
-    }
-    .reveal.visible { opacity: 1; transform: translateY(0); }
-
-    /* ── RESPONSIVE ── */
-    @media (max-width: 900px) {
-      .process-layout { grid-template-columns: 1fr; gap: 40px; }
-      .process-panel { position: static; }
-      .footer-links { gap: 32px; }
-    }
-    @media (max-width: 640px) {
-      nav { padding: 18px 6%; }
-      .nav-links { display: none; }
-      section { padding: 80px 6%; }
-      .hero { padding: 110px 6% 70px; }
-      .footer-top { flex-direction: column; }
-      .footer-bottom { flex-direction: column; align-items: flex-start; }
-    }
-  </style>
+/* cta */
+.cta{background:var(--ink);color:var(--bg);border-radius:18px;padding:52px;display:grid;grid-template-columns:1.3fr 1fr;gap:40px;align-items:center}
+.cta h2{color:var(--bg)}
+.cta p{color:color-mix(in srgb,var(--bg) 75%,var(--ink))}
+.mail{display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:color-mix(in srgb,var(--bg) 10%,var(--ink));padding:14px 16px;border-radius:10px}
+.mail code{font-family:var(--f-mono);font-size:16px;color:var(--bg);user-select:all;flex:1;min-width:0;overflow-wrap:anywhere}
+.cta .btn-primary{background:var(--accent);color:var(--accent-ink)}
+@media (max-width:800px){.cta{grid-template-columns:1fr;padding:32px 22px}}
+footer{padding-block:36px;color:var(--muted);font-size:13px}
+footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 </head>
 <body>
 
-  <!-- NAV -->
-  <nav id="navbar">
-    <a href="#" class="logo">Now<span>Projects</span></a>
-    <ul class="nav-links">
-      <li><a href="#products">Solutions</a></li>
-      <li><a href="#process">Our Process</a></li>
-      <li><a href="#why">Why Us</a></li>
-      <li><a href="#contact" class="nav-cta">Start a Project</a></li>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="#top">NowProjects.ai <small>VR</small></a>
+    <ul>
+      <li><a href="#maturity">Maturity</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#compliance">Compliance</a></li>
+      <li><a href="#fixes">Fixes</a></li>
+      <li><a href="#process">Process</a></li>
     </ul>
-  </nav>
-
-  <!-- HERO -->
-  <section class="hero">
-    <p class="hero-ai-badge" style="display:inline-flex;align-items:center;gap:0.4rem;background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.4);border-radius:999px;padding:0.3rem 0.9rem;font-size:0.8rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:#a5b4fc;margin-bottom:1rem;">⚡ AI-Driven Automation</p>
-<h1>Secure your enterprise with <em>ServiceNow SecOps.</em></h1>
-    <p class="hero-sub">NowProjects specializes in implementing ServiceNow Security Operations, from Vulnerability Response and GRC to Config Compliance and beyond.</p>
-    <div class="hero-actions">
-      <a href="#contact" class="btn-primary">Book a Discovery Call →</a>
-      <a href="#products" class="btn-secondary">Explore our solutions</a>
-    </div>
-    <div class="product-pills">
-      <span class="pill">Vulnerability Response</span>
-      <span class="pill">GRC</span>
-      <span class="pill">Security Incident Response</span>
-      <span class="pill">Config Compliance</span>
-      <span class="pill">Risk Management</span>
-      <span class="pill">Threat Intelligence</span>
-      <span class="pill">Audit Management</span>
-      <span class="pill">TPRM</span>
-      <span class="pill">Claude Code</span>
-    </div>
-  </section>
-
-  <!-- TRUST STRIP -->
-  <div class="trust-strip">
-    <p>Trusted by</p>
-    <span class="trust-divider">|</span>
-    <span class="trust-item">Fortune 500 Enterprises</span>
-    <span class="trust-divider">·</span>
-    <span class="trust-item">Federal Agencies</span>
-    <span class="trust-divider">·</span>
-    <span class="trust-item">Healthcare Systems</span>
-    <span class="trust-divider">·</span>
-    <span class="trust-item">Financial Institutions</span>
-    <span class="trust-divider">·</span>
-    <span class="trust-item">Technology Companies</span>
+    <a class="btn btn-primary btn-sm" href="#contact">Book a Health Check</a>
   </div>
+</header>
 
-  <!-- PRODUCTS / SOLUTIONS -->
-  <section id="products">
-    <div class="reveal">
-      <p class="section-label">ServiceNow Solutions</p>
-      <h2 class="section-title">Everything you need to operationalize security at scale.</h2>
-      <p class="section-sub">We implement, configure, and optimize the full ServiceNow SecOps and GRC suite, tailored to your organization's risk posture.</p>
+<main id="top">
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <span class="eyebrow">ServiceNow Vulnerability Response specialists</span>
+      <h1>ServiceNow <em>Vulnerability Response</em> consulting for platform owners.</h1>
+      <p class="lede">We help ServiceNow platform owners get VR working the way it was designed: findings on the right CI, work routed to the right team, SLAs that satisfy auditors, and a clean upgrade every release.</p>
+      <div class="ctas">
+        <a class="btn btn-primary" href="#contact">Book a VR Health Check</a>
+        <a class="btn btn-ghost" href="#selfcheck">Score your deployment</a>
+      </div>
+      <p class="who">Vulnerability Response is the only thing we do.</p>
     </div>
-    <div class="products-grid reveal">
 
-      <div class="product-card featured">
-        <span class="product-icon">🛡️</span>
-        <div class="product-tag" style="background:rgba(0,87,255,0.2);color:#4d8eff;">Core Offering</div>
-        <h3>Vulnerability Response (VR)</h3>
-        <p>Eliminate the gap between IT and Security. We implement VR to automatically prioritize, assign, and track remediation of vulnerabilities, connecting scanner data directly to CMDB.</p>
-        <ul class="product-features">
-          <li>Third-party scanner integrations (Tenable, Qualys, Rapid7)</li>
-          <li>Automated risk scoring & prioritization workflows</li>
-          <li>SLA tracking and executive dashboards</li>
-          <li>CMDB-driven asset attribution</li>
-        </ul>
-      </div>
-
-      <div class="product-card">
-        <span class="product-icon">📋</span>
-        <div class="product-tag">GRC</div>
-        <h3>Governance, Risk & Compliance</h3>
-        <p>Build a unified GRC program on ServiceNow. We implement Policy & Compliance Management, Risk Management, and Audit Management, mapped to your regulatory frameworks.</p>
-        <ul class="product-features">
-          <li>NIST, ISO 27001, SOC 2, HIPAA, FedRAMP mapping</li>
-          <li>Continuous control monitoring and attestation</li>
-          <li>Risk registers with heat maps & scoring</li>
-          <li>Audit workflow automation</li>
-        </ul>
-      </div>
-
-      <div class="product-card">
-        <span class="product-icon">⚙️</span>
-        <div class="product-tag green">Compliance</div>
-        <h3>Configuration Compliance</h3>
-        <p>Automate the detection and remediation of misconfigured assets. We implement CC to continuously assess your environment against CIS Benchmarks and internal policies.</p>
-        <ul class="product-features">
-          <li>CIS Benchmark & DISA STIG integration</li>
-          <li>Real-time configuration drift detection</li>
-          <li>Automated remediation task creation</li>
-          <li>Compliance posture reporting</li>
-        </ul>
-      </div>
-
-      <div class="product-card">
-        <span class="product-icon">🚨</span>
-        <div class="product-tag">SecOps</div>
-        <h3>Security Incident Response (SIR)</h3>
-        <p>Accelerate your SOC with structured, automated incident response workflows. We configure SIR to reduce MTTR and give analysts the context they need to act fast.</p>
-        <ul class="product-features">
-          <li>SIEM & SOAR integrations (Splunk, Sentinel, QRadar)</li>
-          <li>Automated triage and playbook execution</li>
-          <li>Threat Intelligence integration</li>
-          <li>Post-incident reporting & lessons learned</li>
-        </ul>
-      </div>
-
-      <div class="product-card">
-        <span class="product-icon">🔗</span>
-        <div class="product-tag green">Risk</div>
-        <h3>Third-Party Risk Management</h3>
-        <p>Extend your security posture to vendors and suppliers. We implement TPRM to automate vendor assessments, track findings, and ensure continuous monitoring.</p>
-        <ul class="product-features">
-          <li>Automated vendor onboarding questionnaires</li>
-          <li>Risk tiering and inherent risk scoring</li>
-          <li>Remediation tracking and evidence collection</li>
-          <li>Contract and vendor profile management</li>
-        </ul>
-      </div>
-
-      <div class="product-card">
-        <span class="product-icon">🔍</span>
-        <div class="product-tag">Advisory</div>
-        <h3>Health Checks & Optimization</h3>
-        <p>Already on ServiceNow SecOps but not getting the value you expected? We audit your existing instance, identify gaps, and tune configurations for maximum ROI.</p>
-        <ul class="product-features">
-          <li>Instance health assessment & scoring</li>
-          <li>Workflow and integration audit</li>
-          <li>CMDB data quality remediation</li>
-          <li>Upgrade readiness planning</li>
-        </ul>
-      </div>
-
-      <div class="product-card featured">
-        <span class="product-icon">🤖</span>
-        <div class="product-tag" style="background:rgba(124,58,237,0.2);color:#a78bfa;">AI-Powered</div>
-        <h3>Claude Code: AI-Accelerated Development</h3>
-        <p>We use Claude Code to scale ServiceNow development and administration, delivering more configurations, automations, and integrations in less time, with fewer errors.</p>
-        <ul class="product-features">
-          <li>AI-assisted script and flow development</li>
-          <li>Rapid prototyping of custom integrations</li>
-          <li>Automated code review and quality checks</li>
-          <li>Faster admin tasks and platform management</li>
-        </ul>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- PROCESS -->
-  <section id="process">
-    <div class="process-layout">
-      <div class="reveal">
-        <p class="section-label">Implementation Methodology</p>
-        <h2 class="section-title">A proven path from kickoff to go-live.</h2>
-        <p class="section-sub">Our structured delivery model gets you live faster, without the rework that comes from skipping steps.</p>
-        <div class="process-steps" style="margin-top:40px;">
-          <div class="step">
-            <div class="step-num">01</div>
-            <div class="step-content">
-              <h4>Discovery & Current State</h4>
-              <p>We assess your existing security tooling, CMDB health, integrations, and team workflows to understand what we're building on, and what needs to change first.</p>
-            </div>
-          </div>
-          <div class="step">
-            <div class="step-num">02</div>
-            <div class="step-content">
-              <h4>Design & Architecture</h4>
-              <p>We design your ServiceNow configuration (data model, workflows, integrations, roles, and dashboards) and get stakeholder sign-off before building anything.</p>
-            </div>
-          </div>
-          <div class="step">
-            <div class="step-num">03</div>
-            <div class="step-content">
-              <h4>Agile Build & Configure</h4>
-              <p>Two-week sprints with working demos every cycle. You see progress continuously, and course-correction is built into the process, not bolted on at the end.</p>
-            </div>
-          </div>
-          <div class="step">
-            <div class="step-num">04</div>
-            <div class="step-content">
-              <h4>Testing & UAT</h4>
-              <p>Rigorous functional testing, integration validation, and guided user acceptance testing with your security and IT teams before any production deployment.</p>
-            </div>
-          </div>
-          <div class="step">
-            <div class="step-num">05</div>
-            <div class="step-content">
-              <h4>Go-Live & Enablement</h4>
-              <p>Controlled production cutover, real-time monitoring during hyper-care, and comprehensive training so your team owns the platform from day one.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="process-panel reveal">
-        <div class="panel-card">
-          <div class="panel-card-header">
-            <h5>VR Implementation · Sprint 3 of 5</h5>
-            <span class="status-badge status-green">On Track</span>
-          </div>
-          <div class="panel-progress">
-            <div class="panel-progress-bar" style="width: 62%;"></div>
-          </div>
-          <p class="panel-meta">62% complete · Est. go-live in 4 weeks</p>
-        </div>
-
-        <div class="panel-card">
-          <div class="panel-card-header">
-            <h5>Vulnerability Findings</h5>
-            <span class="status-badge status-blue">Live Data</span>
-          </div>
-          <div class="findings-list">
-            <div class="finding-row">
-              <span class="finding-label">Critical</span>
-              <span class="finding-count count-red">24</span>
-            </div>
-            <div class="finding-row">
-              <span class="finding-label">High</span>
-              <span class="finding-count count-orange">187</span>
-            </div>
-            <div class="finding-row">
-              <span class="finding-label">Medium</span>
-              <span class="finding-count count-yellow">612</span>
-            </div>
-            <div class="finding-row">
-              <span class="finding-label">Remediated (30d)</span>
-              <span class="finding-count count-green">+341</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="panel-card">
-          <div class="panel-card-header">
-            <h5>Compliance Posture · GRC</h5>
-            <span class="status-badge status-green">Improving</span>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:10px;">
-            <div>
-              <div style="display:flex;justify-content:space-between;font-size:0.78rem;margin-bottom:5px;">
-                <span style="color:var(--gray-600);">NIST CSF</span>
-                <span style="font-weight:600;">78%</span>
-              </div>
-              <div class="panel-progress"><div class="panel-progress-bar" style="width:78%;"></div></div>
-            </div>
-            <div>
-              <div style="display:flex;justify-content:space-between;font-size:0.78rem;margin-bottom:5px;">
-                <span style="color:var(--gray-600);">ISO 27001</span>
-                <span style="font-weight:600;">64%</span>
-              </div>
-              <div class="panel-progress"><div class="panel-progress-bar" style="width:64%;"></div></div>
-            </div>
-            <div>
-              <div style="display:flex;justify-content:space-between;font-size:0.78rem;margin-bottom:5px;">
-                <span style="color:var(--gray-600);">SOC 2 Type II</span>
-                <span style="font-weight:600;">91%</span>
-              </div>
-              <div class="panel-progress"><div class="panel-progress-bar" style="width:91%;background:linear-gradient(90deg,var(--green),#00d4a0);"></div></div>
-            </div>
-          </div>
-        </div>
+    <div class="card score" aria-label="Example VR Health Check scorecard">
+      <div class="score-head"><b>VR Health Check</b><span class="tag">Example findings</span></div>
+      <div class="row"><span>Vulnerable items matched to a CI</span><span class="v">71%</span><span class="pill p-high">Below 90%</span></div>
+      <div class="row"><span>Open VIs past remediation target</span><span class="v">18,402</span><span class="pill p-crit">Critical</span></div>
+      <div class="row"><span>CISA KEV items without a target date</span><span class="v">312</span><span class="pill p-crit">Critical</span></div>
+      <div class="row"><span>Customized out-of-box VR records</span><span class="v">64</span><span class="pill p-high">Upgrade risk</span></div>
+      <div class="row"><span>Exceptions with no expiry date</span><span class="v">1,140</span><span class="pill p-med">Audit gap</span></div>
+      <div class="row"><span>Scanner integrations running clean</span><span class="v">3 / 3</span><span class="pill p-ok">Healthy</span></div>
+      <div class="meter">
+        <div class="lbl"><span>Deployment maturity</span><b>Level 2 of 5</b></div>
+        <div class="steps5"><span class="on"></span><span class="on"></span><span></span><span></span><span></span></div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- WHY US -->
-  <section id="why">
-    <div class="reveal">
-      <p class="section-label">Why NowProjects</p>
-      <h2 class="section-title" style="color:var(--white);">ServiceNow SecOps, done right.</h2>
-      <p class="section-sub" style="color:rgba(255,255,255,0.45);">We've seen what bad implementations look like. We build the right way, with CMDB integrity, clean integrations, and workflows your team will actually use.</p>
+<div class="symptoms">
+  <div class="wrap">
+    <span class="eyebrow" style="color:var(--crit)">Sound familiar?</span>
+    <ul>
+      <li>Thousands of findings sit on unmatched or duplicate CIs</li>
+      <li>Remediation tasks get reassigned by hand every week</li>
+      <li>Exceptions are approved in email and never expire</li>
+      <li>Your last upgrade left a pile of skipped VR records</li>
+      <li>Audit asks for SLA adherence and you build a spreadsheet</li>
+      <li>Nobody remembers why that business rule exists</li>
+    </ul>
+  </div>
+</div>
+
+<section class="sec" id="maturity">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">VR deployment maturity</span>
+      <h2>Five levels, from importing scans to reducing risk on purpose.</h2>
+      <p class="lede">Most deployments we assess stall at Level 2. Pick a level to see what it looks like and what it takes to get past it.</p>
     </div>
-    <div class="why-grid reveal">
-      <div class="why-card">
-        <div class="why-stat">40<span>+</span></div>
-        <h4>SecOps implementations</h4>
-        <p>Across VR, SIR, GRC, Config Compliance, and TPRM, in regulated and non-regulated industries.</p>
-      </div>
-      <div class="why-card">
-        <div class="why-stat">60<span>%</span></div>
-        <h4>Faster time to value</h4>
-        <p>Our accelerators, pre-built integrations, and Claude Code-powered development cut typical project timelines significantly.</p>
-      </div>
-      <div class="why-card">
-        <div class="why-stat">100<span>%</span></div>
-        <h4>Certified consultants</h4>
-        <p>Every consultant on your project holds active ServiceNow certifications in the relevant product areas.</p>
-      </div>
-      <div class="why-card">
-        <div class="why-stat">3<span>yr</span></div>
-        <h4>Average client relationship</h4>
-        <p>We don't just implement and leave. Our clients keep us as a trusted partner for ongoing optimization.</p>
-      </div>
-    </div>
-    <div class="certs-row reveal">
-      <div class="cert-chip"><span>✓</span> ServiceNow Certified Implementation Specialist: SecOps</div>
-      <div class="cert-chip"><span>✓</span> CIS: GRC</div>
-      <div class="cert-chip"><span>✓</span> CIS: Vulnerability Response</div>
-      <div class="cert-chip"><span>✓</span> CISSP</div>
-      <div class="cert-chip"><span>✓</span> CISM</div>
-      <div class="cert-chip"><span>✓</span> ServiceNow Partner</div>
-      <div class="cert-chip"><span>✓</span> Claude Code: AI-Powered Development & Administration</div>
-    </div>
-  </section>
 
-  <!-- CTA -->
-  <section id="contact">
-    <div class="reveal">
-      <h2 class="section-title" style="max-width:580px;">Ready to take control of your security posture?</h2>
-      <p class="section-sub">Tell us about your ServiceNow environment and security goals. We'll come back with a clear, honest assessment and a proposed path forward.</p>
+    <div class="ladder" role="tablist" aria-label="Maturity levels" id="ladder"></div>
+    <div class="card detail" id="detail" role="tabpanel" aria-live="polite"></div>
 
-      <form id="discovery-form" name="discovery-call" method="POST" action="https://formsubmit.co/hello@nowprojects.ai">
-        <input type="hidden" name="_subject" value="New Discovery Call Request: NowProjects"/>
-        <input type="hidden" name="_template" value="table"/>
-        <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off"/>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="f-name">Full Name *</label>
-            <input type="text" id="f-name" name="name" placeholder="Jane Smith" required/>
-          </div>
-          <div class="form-group">
-            <label for="f-email">Work Email *</label>
-            <input type="email" id="f-email" name="email" placeholder="jane@company.com" required/>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="f-company">Company</label>
-            <input type="text" id="f-company" name="company" placeholder="Acme Corp"/>
-          </div>
-          <div class="form-group">
-            <label for="f-role">Your Role</label>
-            <input type="text" id="f-role" name="role" placeholder="CISO, Security Engineer..."/>
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="f-message">What are you looking to solve? *</label>
-          <textarea id="f-message" name="message" rows="4" placeholder="Tell us about your ServiceNow environment, current challenges, or what you'd like to achieve..." required></textarea>
-        </div>
-        <div class="form-actions">
-          <button type="submit" class="btn-primary" id="form-submit-btn">Book a Discovery Call →</button>
-          <a href="https://linkedin.com/company/nowprojects" target="_blank" rel="noopener" class="btn-secondary">View our LinkedIn</a>
-        </div>
-        <p id="form-success" style="display:none; color:var(--green); font-weight:600; margin-top:16px;">✓ Message sent! We'll be in touch within 1 business day.</p>
-      </form>
-
-      <script>
-        const form = document.getElementById('discovery-form');
-        form.addEventListener('submit', async e => {
-          e.preventDefault();
-          const btn = document.getElementById('form-submit-btn');
-          btn.textContent = 'Sending...';
-          btn.disabled = true;
-          try {
-            const res = await fetch('https://formsubmit.co/ajax/hello@nowprojects.ai', {
-              method: 'POST',
-              headers: { 'Accept': 'application/json' },
-              body: new FormData(form)
-            });
-            if (res.ok) {
-              form.reset();
-              document.getElementById('form-success').style.display = 'block';
-              btn.textContent = '✓ Sent!';
-            } else {
-              throw new Error('bad response');
-            }
-          } catch {
-            btn.textContent = 'Book a Discovery Call →';
-            btn.disabled = false;
-            document.getElementById('form-success').style.display = 'block';
-            document.getElementById('form-success').style.color = '#e53e3e';
-            document.getElementById('form-success').innerHTML = 'Something went wrong. Please email <a href="mailto:hello@nowprojects.ai">hello@nowprojects.ai</a> directly.';
-          }
-        });
-      </script>
-    </div>
-  </section>
-
-  <!-- FOOTER -->
-  <footer>
-    <div class="footer-top">
+    <div class="card check" id="selfcheck">
       <div>
-        <a href="#" class="footer-logo">Now<span>Projects</span></a>
-        <p class="footer-tagline">ServiceNow SecOps & GRC implementation specialists.</p>
-        <div style="margin-top:16px;">
-          <span class="sn-partner-badge">✦ ServiceNow Partner</span>
-        </div>
+        <span class="eyebrow">2 minute self check</span>
+        <h3 style="margin-block:8px 16px;font-size:24px">Where does your deployment sit?</h3>
+        <div class="qs" id="qs"></div>
       </div>
-      <div class="footer-links">
-        <div class="footer-col">
-          <h5>Solutions</h5>
-          <ul>
-            <li><a href="#products">Vulnerability Response</a></li>
-            <li><a href="#products">GRC</a></li>
-            <li><a href="#products">Config Compliance</a></li>
-            <li><a href="#products">Security Incident Response</a></li>
-            <li><a href="#products">Third-Party Risk</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h5>Company</h5>
-          <ul>
-            <li><a href="#process">Methodology</a></li>
-            <li><a href="#why">Why NowProjects</a></li>
-            <li><a href="#testimonials">Case Studies</a></li>
-            <li><a href="https://linkedin.com/company/nowprojects" target="_blank" rel="noopener">LinkedIn</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h5>Contact</h5>
-          <ul>
-            <li><a href="mailto:hello@nowprojects.ai">hello@nowprojects.ai</a></li>
-            <li><a href="#contact">Book a Call</a></li>
-          </ul>
-        </div>
-      </div>
+      <div class="result" id="result"></div>
     </div>
-    <div class="footer-bottom">
-      <span>© 2026 NowProjects. All rights reserved.</span>
-      <div style="display:flex;gap:24px;">
-        <a href="#">Privacy Policy</a>
-        <a href="#">Terms of Service</a>
-      </div>
-    </div>
-  </footer>
+  </div>
+</section>
 
-  <script>
-    const navbar = document.getElementById('navbar');
-    window.addEventListener('scroll', () => {
-      navbar.classList.toggle('scrolled', window.scrollY > 20);
-    });
-    const reveals = document.querySelectorAll('.reveal');
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) entry.target.classList.add('visible');
-      });
-    }, { threshold: 0.08, rootMargin: '0px 0px -60px 0px' });
-    reveals.forEach(el => observer.observe(el));
-  </script>
+<section class="sec band" id="services">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Services</span>
+      <h2>Four ways we work, all inside Vulnerability Response.</h2>
+    </div>
+    <div class="svc">
+      <div class="card feature">
+        <div class="meta"><span>Fixed scope</span><span>2 weeks</span><span>Start here</span></div>
+        <h3>VR Health Check</h3>
+        <p>A read-only review of your instance that tells you exactly where you stand and what to fix first.</p>
+        <ul>
+          <li>Maturity score against the five-level model</li>
+          <li>CI match rate and CMDB identification review</li>
+          <li>Customization and upgrade skip audit</li>
+          <li>Prioritized 90-day roadmap with effort estimates</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="meta"><span>Implementation</span><span>6 to 12 weeks</span></div>
+        <h3>Implementation and Integration</h3>
+        <p>New VR rollouts and rebuilds done out of the box first, so every future upgrade stays easy.</p>
+        <ul>
+          <li>Scanner integrations and scheduling</li>
+          <li>IRE identification and reconciliation rules</li>
+          <li>Remediation task, assignment and target rules</li>
+          <li>Risk calculators tuned to your environment</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="meta"><span>Compliance</span><span>4 to 6 weeks</span></div>
+        <h3>Compliance Alignment</h3>
+        <p>Turn your policy's remediation timelines into rules ServiceNow enforces and reports on.</p>
+        <ul>
+          <li>Remediation targets mapped to PCI, NIST, FedRAMP and more</li>
+          <li>Exception workflow with approvals and expiry</li>
+          <li>Audit-ready SLA and exception dashboards</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="meta"><span>Remediation</span><span>Scoped from Health Check</span></div>
+        <h3>Back to Baseline</h3>
+        <p>We unwind the customizations that break upgrades and slow your team down, then document what stays.</p>
+        <ul>
+          <li>Revert modified out-of-box records safely</li>
+          <li>Replace scripts with configuration</li>
+          <li>Clear skipped records from past upgrades</li>
+        </ul>
+      </div>
+    </div>
+    <div class="logos"><span>Integrations we work with:</span>
+      <span class="src">Qualys</span><span class="src">Tenable</span><span class="src">Rapid7</span><span class="src">Microsoft Defender</span><span class="src">CrowdStrike</span><span class="src">Wiz</span>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="compliance">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Compliance</span>
+      <h2>Show auditors the rule, the record, and the result.</h2>
+      <p class="lede">Every framework asks some version of the same question: do you find, fix, and track vulnerabilities on time? VR can answer it directly when it is configured for it.</p>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Framework</th><th>What it asks for</th><th>How we configure VR to prove it</th></tr></thead>
+        <tbody>
+          <tr><td>PCI DSS v4.0</td><td>Critical patches within one month <span class="mono">(6.3.3)</span>; internal scans at least quarterly <span class="mono">(11.3.1)</span></td><td>Remediation target rules for in-scope CIs, scan recency tracking, CDE-tagged dashboards</td></tr>
+          <tr><td>NIST SP 800-53</td><td>Vulnerability monitoring <span class="mono">(RA-5)</span> and flaw remediation <span class="mono">(SI-2)</span></td><td>Scanner coverage reporting, targets by risk rating, closure evidence on each item</td></tr>
+          <tr><td>FedRAMP</td><td>High findings in 30 days, moderate in 90, low in 180</td><td>Target rules matched to those windows, POA&amp;M-ready exception records</td></tr>
+          <tr><td>CISA BOD 22-01</td><td>Known Exploited Vulnerabilities fixed by the catalog due date</td><td>KEV-aware risk scoring and target dates, KEV aging dashboard</td></tr>
+          <tr><td>ISO/IEC 27001:2022</td><td>Management of technical vulnerabilities <span class="mono">(A.8.8)</span></td><td>Documented process in VR workflow, exception approvals with owner and expiry</td></tr>
+          <tr><td>SOC 2</td><td>Detect and monitor for new vulnerabilities <span class="mono">(CC7.1)</span></td><td>Continuous ingestion, trend reporting, evidence exports for the audit window</td></tr>
+          <tr><td>HIPAA Security Rule</td><td>Ongoing risk analysis and risk management</td><td>ePHI system grouping, risk-ranked remediation, exception rationale on record</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">Control references are summaries for orientation. Your auditor and policy define the exact requirement.</p>
+  </div>
+</section>
+
+<section class="sec band" id="fixes">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Fixes and customizations</span>
+      <h2>What we find in real instances, and what we do about it.</h2>
+    </div>
+    <div class="fixes">
+      <div class="card fix"><div><span class="lab">We find</span><p>Modified out-of-box business rules on <span class="mono">sn_vul_vulnerable_item</span></p></div><div class="arrow" aria-hidden="true">&rarr;</div><div><span class="lab">We fix</span><p>Revert to baseline and move custom logic into new, documented rules</p></div><span class="pill p-crit">Upgrade blocker</span></div>
+      <div class="card fix"><div><span class="lab">We find</span><p>Scanner imports creating duplicate CIs outside the IRE</p></div><div class="arrow" aria-hidden="true">&rarr;</div><div><span class="lab">We fix</span><p>Identification and reconciliation rules so every finding lands on one CI</p></div><span class="pill p-high">Data quality</span></div>
+      <div class="card fix"><div><span class="lab">We find</span><p>Assignment hard-coded in scripts and reassigned by hand</p></div><div class="arrow" aria-hidden="true">&rarr;</div><div><span class="lab">We fix</span><p>Assignment rules driven by CI support group and ownership data</p></div><span class="pill p-high">Wasted effort</span></div>
+      <div class="card fix"><div><span class="lab">We find</span><p>Custom exception tables and email approvals</p></div><div class="arrow" aria-hidden="true">&rarr;</div><div><span class="lab">We fix</span><p>Out-of-box exception workflow with approvers, reasons and expiry dates</p></div><span class="pill p-med">Audit gap</span></div>
+      <div class="card fix"><div><span class="lab">We find</span><p>Grouping rules that open thousands of tiny remediation tasks</p></div><div class="arrow" aria-hidden="true">&rarr;</div><div><span class="lab">We fix</span><p>Task grouping tuned to how your teams patch: by solution, CI class or owner</p></div><span class="pill p-med">Noise</span></div>
+      <div class="card fix"><div><span class="lab">We find</span><p>Years of skipped records in <span class="mono">sys_upgrade_history_log</span></p></div><div class="arrow" aria-hidden="true">&rarr;</div><div><span class="lab">We fix</span><p>Review, merge or revert each one, then leave you a clean baseline</p></div><span class="pill p-crit">Upgrade blocker</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="process">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">How an engagement runs</span>
+      <h2>Assess first. Fix what matters. Hand it back clean.</h2>
+    </div>
+    <div class="proc">
+      <div><span class="n">01</span><h3>Assess</h3><span class="wk">Weeks 1 to 2</span><p>Read-only instance review, stakeholder interviews, maturity score.</p></div>
+      <div><span class="n">02</span><h3>Plan</h3><span class="wk">Week 3</span><p>Roadmap ranked by risk reduction and upgrade impact, agreed with you.</p></div>
+      <div><span class="n">03</span><h3>Fix</h3><span class="wk">Weeks 4 to 10</span><p>Configuration over code, tested in sub-prod, promoted with update sets you own.</p></div>
+      <div><span class="n">04</span><h3>Hand off</h3><span class="wk">Final week</span><p>Runbooks, admin training, and a before and after maturity score.</p></div>
+    </div>
+    <div class="proof">
+      <div><b>40+</b><span>SecOps implementations delivered</span></div>
+      <div><b>CIS-VR</b><span>ServiceNow Certified Implementation Specialist</span></div>
+      <div><b>CISSP</b><span>and CISM certified leadership</span></div>
+      <div><b>100%</b><span>senior consultants, no offshore handoff</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="contact" style="padding-top:0">
+  <div class="wrap">
+    <div class="cta">
+      <div style="display:grid;gap:14px">
+        <h2>Start with a two week VR Health Check.</h2>
+        <p>Fixed scope, fixed fee, read-only access. You get a maturity score, a customization audit and a 90-day plan, whether or not we do the work after.</p>
+      </div>
+      <div style="display:grid;gap:12px">
+        <div class="mail"><code id="email">hello@nowprojects.ai</code><button class="btn btn-primary btn-sm" id="copy" type="button">Copy email</button></div>
+        <p style="font-size:14px">Tell us your instance release, scanners, and roughly how many open vulnerable items you have.</p>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap"><span>&copy; 2026 NowProjects.ai. ServiceNow Vulnerability Response consulting.</span><span>San Antonio, Texas</span></div>
+</footer>
+
+<script>
+const levels=[
+ {n:"Ingest",t:"Scanner data lands in ServiceNow.",look:["Scans import on a schedule","Many findings sit on unmatched CIs","Work is assigned by hand","SLAs tracked outside the platform"],do:["Stabilize integrations and schedules","Baseline CI match rate","Define ownership sources"]},
+ {n:"Identify",t:"Every finding lands on the right CI.",look:["CI match rate above 90%","Support group populated on in-scope CIs","Duplicates handled by the IRE"],do:["Tune identification and reconciliation","Close CMDB ownership gaps","Retire unmatched item backlog"]},
+ {n:"Route",t:"Work reaches the right team on its own.",look:["Remediation tasks created by rules","Assignment from CI ownership data","Targets set by risk rating"],do:["Design task grouping around how teams patch","Build assignment and target rules","Remove scripted workarounds"]},
+ {n:"Govern",t:"SLAs and exceptions stand up to audit.",look:["Exceptions approved in workflow with expiry","SLA adherence reported by severity","Evidence available on demand"],do:["Map policy timelines to target rules","Implement exception workflow","Build audit dashboards"]},
+ {n:"Optimize",t:"Risk goes down on purpose.",look:["Risk scores use exploit data such as KEV","Remediation linked to change and patching","Clean upgrades every release"],do:["Tune risk calculators with threat data","Connect remediation to change","Trend risk reduction for leadership"]}
+];
+const ladder=document.getElementById('ladder'),detail=document.getElementById('detail');
+function showLevel(i){
+  [...ladder.children].forEach((b,j)=>b.setAttribute('aria-selected',j===i));
+  const L=levels[i];
+  detail.innerHTML=`<div><span class="eyebrow">Level ${i+1}</span><h3>${L.n}</h3><p class="lede" style="font-size:16px">${L.t}</p></div>
+  <div><h4>What it looks like</h4><ul>${L.look.map(x=>`<li>${x}</li>`).join('')}</ul></div>
+  <div><h4>What we do to get you here</h4><ul>${L.do.map(x=>`<li>${x}</li>`).join('')}</ul></div>`;
+}
+levels.forEach((L,i)=>{const b=document.createElement('button');b.className='rung';b.setAttribute('role','tab');b.id='lvl'+(i+1);
+  b.innerHTML=`<span class="lv">Level ${i+1}</span><span class="nm">${L.n}</span>`;b.onclick=()=>showLevel(i);ladder.appendChild(b);});
+showLevel(1);
+
+const qs=[
+ [2,"More than 90% of vulnerable items match a CMDB CI"],
+ [2,"Every in-scope CI has an assigned support group"],
+ [3,"Remediation tasks are created and assigned by rules"],
+ [3,"Remediation targets are set by risk rating in ServiceNow"],
+ [4,"Exceptions go through approval and carry an expiry date"],
+ [4,"You can show SLA adherence by severity from a dashboard"],
+ [5,"Risk scores factor in exploit data such as CISA KEV"],
+ [5,"Your last upgrade left no VR skipped records to review"]
+];
+const ans=qs.map(()=>null);const qEl=document.getElementById('qs'),res=document.getElementById('result');
+qs.forEach((q,i)=>{const d=document.createElement('div');d.className='q';
+  d.innerHTML=`<span>${q[1]}</span><div class="yn" role="group" aria-label="${q[1]}"><button type="button" class="y" id="q${i}y" aria-pressed="false">Yes</button><button type="button" class="n" id="q${i}n" aria-pressed="false">No</button></div>`;
+  const [y,n]=d.querySelectorAll('button');
+  y.onclick=()=>{ans[i]=true;y.setAttribute('aria-pressed','true');n.setAttribute('aria-pressed','false');score();};
+  n.onclick=()=>{ans[i]=false;n.setAttribute('aria-pressed','true');y.setAttribute('aria-pressed','false');score();};
+  qEl.appendChild(d);});
+function score(){
+  const answered=ans.filter(a=>a!==null).length;let lvl=1;
+  for(let L=2;L<=5;L++){const idx=qs.map((q,i)=>q[0]===L?i:-1).filter(i=>i>=0);if(idx.every(i=>ans[i]===true))lvl=L;else break;}
+  const next=lvl<5?levels[lvl]:null;
+  res.innerHTML=`<span class="eyebrow">${answered<qs.length?`${answered} of ${qs.length} answered`:'Your result'}</span>
+  <div class="big">${lvl}<small> / 5</small></div>
+  <div class="steps5">${[1,2,3,4,5].map(k=>`<span class="${k<=lvl?'on':''}"></span>`).join('')}</div>
+  <p><b>Level ${lvl}: ${levels[lvl-1].n}.</b> ${levels[lvl-1].t}</p>
+  ${next?`<p style="color:var(--muted);font-size:15px">Next step: ${next.do[0].toLowerCase()}. A Health Check shows the full path to Level ${lvl+1}.</p>`:`<p style="color:var(--muted);font-size:15px">You are running VR at full maturity. A Health Check can confirm it before your next upgrade.</p>`}
+  <a class="btn btn-primary btn-sm" href="#contact" style="align-self:start">Book a Health Check</a>`;
+}
+score();
+
+document.getElementById('copy').addEventListener('click',e=>{
+  const t=document.getElementById('email').textContent,b=e.currentTarget;
+  const done=()=>{b.textContent='Copied';setTimeout(()=>b.textContent='Copy email',1800);};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done).catch(sel);}else sel();
+  function sel(){const r=document.createRange();r.selectNodeContents(document.getElementById('email'));const s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Press Ctrl+C';}
+});
+</script>
+
 </body>
 </html>
