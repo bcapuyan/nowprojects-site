@@ -184,6 +184,15 @@ td .mono{color:var(--accent)}
 .mail code{font-family:var(--f-mono);font-size:16px;color:var(--bg);user-select:all;flex:1;min-width:0;overflow-wrap:anywhere}
 .cta .btn-primary{background:var(--accent);color:var(--accent-ink)}
 @media (max-width:800px){.cta{grid-template-columns:1fr;padding:32px 22px}}
+.cta form{display:grid;gap:12px}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cta label{display:grid;gap:5px;font-size:13px;font-weight:500;color:color-mix(in srgb,var(--bg) 78%,var(--ink))}
+.cta input,.cta textarea{font:inherit;font-size:15px;padding:10px 12px;border-radius:8px;border:1px solid color-mix(in srgb,var(--bg) 28%,var(--ink));background:color-mix(in srgb,var(--bg) 8%,var(--ink));color:var(--bg);width:100%}
+.cta input:focus,.cta textarea:focus{outline:2px solid var(--accent);outline-offset:1px}
+.cta textarea{min-height:96px;resize:vertical}
+.cta button[disabled]{opacity:.7;cursor:wait}
+.form-out{font-size:14px;min-height:1.2em}
+@media (max-width:560px){.f2{grid-template-columns:1fr}}
 footer{padding-block:36px;color:var(--muted);font-size:13px}
 footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -398,11 +407,22 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
       <div style="display:grid;gap:14px">
         <h2>Start with a two week VR Health Check.</h2>
         <p>Fixed scope, fixed fee, read-only access. You get a maturity score, a customization audit and a 90-day plan, whether or not we do the work after.</p>
+        <p style="font-size:14px">Prefer email? Write to <span class="mono">hello@nowprojects.ai</span></p>
       </div>
-      <div style="display:grid;gap:12px">
-        <div class="mail"><code id="email">hello@nowprojects.ai</code><button class="btn btn-primary btn-sm" id="copy" type="button">Copy email</button></div>
-        <p style="font-size:14px">Tell us your instance release, scanners, and roughly how many open vulnerable items you have.</p>
-      </div>
+      <form id="hc-form" novalidate>
+        <div class="f2">
+          <label for="f-name">Full name *<input id="f-name" name="name" required autocomplete="name"></label>
+          <label for="f-email">Work email *<input id="f-email" name="email" type="email" required autocomplete="email"></label>
+        </div>
+        <div class="f2">
+          <label for="f-company">Company<input id="f-company" name="company" autocomplete="organization"></label>
+          <label for="f-role">Your role<input id="f-role" name="role" autocomplete="organization-title"></label>
+        </div>
+        <label for="f-text">What are you looking to solve? *<textarea id="f-text" name="message" required placeholder="Instance release, scanners, rough count of open vulnerable items"></textarea></label>
+        <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <button class="btn btn-primary" type="submit" id="f-submit" style="justify-self:start">Request a Health Check</button>
+        <p class="form-out" id="f-out" role="status"></p>
+      </form>
     </div>
   </div>
 </section>
@@ -462,11 +482,20 @@ function score(){
 }
 score();
 
-document.getElementById('copy').addEventListener('click',e=>{
-  const t=document.getElementById('email').textContent,b=e.currentTarget;
-  const done=()=>{b.textContent='Copied';setTimeout(()=>b.textContent='Copy email',1800);};
-  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done).catch(sel);}else sel();
-  function sel(){const r=document.createRange();r.selectNodeContents(document.getElementById('email'));const s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Press Ctrl+C';}
+document.getElementById('hc-form').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const f=e.currentTarget,out=document.getElementById('f-out'),btn=document.getElementById('f-submit');
+  if(!f.checkValidity()){out.textContent='Please add your name, a valid work email, and what you want to solve.';f.reportValidity();return;}
+  btn.disabled=true;btn.textContent='Sending...';out.textContent='';
+  const d=Object.fromEntries(new FormData(f));
+  d._subject='VR Health Check request from '+d.name;d._template='table';d._captcha='false';
+  try{
+    const r=await fetch('https://formsubmit.co/ajax/bcapuyan@gmail.com',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(d)});
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok||String(j.success)==='false')throw new Error(j.message||'failed');
+    f.reset();out.textContent='Thanks, your request is in. We will be in touch shortly.';
+  }catch(err){out.textContent='That did not send. Please email hello@nowprojects.ai instead.';}
+  finally{btn.disabled=false;btn.textContent='Request a Health Check';}
 });
 </script>
 
